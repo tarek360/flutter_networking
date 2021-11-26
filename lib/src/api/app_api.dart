@@ -17,6 +17,7 @@ class AppApi {
   AppApi(
     Client _client,
     BaseUrlBuilder _baseUrlBuilder, {
+    required this.endpointVersion,
     this.authorizationTokenBuilder,
     this.onAuthorizationTokenExpired,
   })  : _network = NetworkHelper(_client, _baseUrlBuilder),
@@ -24,6 +25,7 @@ class AppApi {
 
   final NetworkHelper _network;
   final JsonParser _jsonParser;
+  final String endpointVersion;
 
   final AuthorizationTokenBuilder? authorizationTokenBuilder;
 
@@ -36,7 +38,7 @@ class AppApi {
         maxAttempts: _maxAttempts,
       ).retry(
         () async {
-          networkRequest.endpointVersion = '/operations/v1';
+          networkRequest.endpointVersion = endpointVersion;
           await _appendRequiredHeaders(networkRequest);
           return _network.execute(networkRequest);
         },

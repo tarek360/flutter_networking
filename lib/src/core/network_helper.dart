@@ -29,18 +29,27 @@ class NetworkHelper {
         request.headers[key] = value;
       });
 
+      String requestLog = 'Request => ${networkRequest.method}: $uri';
       final Map<String, String>? bodyFields = networkRequest.bodyFields;
       if (networkRequest.body != null) {
         request.body = json.encode(networkRequest.body);
+        requestLog += '\nbody: ${request.body}';
       } else if (bodyFields != null) {
         request.bodyFields = bodyFields;
+        requestLog += '\nbodyFields: ${request.bodyFields}';
       }
 
-      logger.d('Send => ${networkRequest.method}: $uri');
+      logger.d(requestLog);
 
       final StreamedResponse streamedResponse = await _client.send(request);
       final Response response = await Response.fromStream(streamedResponse);
       final String stringResponse = getStringResponse(response);
+
+      String responseLog = 'Response => ${networkRequest.method}: $uri';
+      responseLog += '\nstatusCode: ${response.statusCode}';
+      responseLog += '\nbody: $stringResponse';
+      logger.d(responseLog);
+
       return stringResponse;
     } on SocketException {
       throw FetchDataException('No Internet connection');
@@ -74,7 +83,8 @@ class NetworkHelper {
       case 500:
       default:
         throw FetchDataException(
-            'Error occurred while Communication with Server with StatusCode : ${response.statusCode}');
+            'Error occurred while Communication with Server with StatusCode : ${response
+                .statusCode}');
     }
   }
 }
