@@ -19,7 +19,6 @@ class AppApi {
     BaseUrlBuilder _baseUrlBuilder, {
     required this.endpointVersion,
     this.authorizationTokenBuilder,
-    this.onAuthorizationTokenExpired,
   })  : _network = NetworkHelper(_client, _baseUrlBuilder),
         _jsonParser = JsonParser();
 
@@ -29,7 +28,7 @@ class AppApi {
 
   final AuthorizationTokenBuilder? authorizationTokenBuilder;
 
-  final VoidCallback? onAuthorizationTokenExpired;
+  VoidCallback? onAuthorizationTokenExpired;
 
   Future<ApiResponse<T>> execute<T, K>(NetworkRequest networkRequest,
       [K Function(Map<String, dynamic>)? fromJson]) async {
