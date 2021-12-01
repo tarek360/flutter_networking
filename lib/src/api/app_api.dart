@@ -10,6 +10,7 @@ import 'api_response.dart';
 import 'json_parser.dart';
 
 typedef AuthorizationTokenBuilder = String? Function();
+typedef OnAuthorizationTokenExpired = Future<void> Function();
 
 class AppApi {
   static const _maxAttempts = 2;
@@ -28,7 +29,7 @@ class AppApi {
 
   final AuthorizationTokenBuilder? authorizationTokenBuilder;
 
-  VoidCallback? onAuthorizationTokenExpired;
+  OnAuthorizationTokenExpired? onAuthorizationTokenExpired;
 
   Future<ApiResponse<T>> execute<T, K>(NetworkRequest networkRequest,
       [K Function(Map<String, dynamic>)? fromJson]) async {
@@ -62,7 +63,7 @@ class AppApi {
     if (exception is UnauthorisedException) {
       logger.d('UnauthorisedException: the request will be retried once,'
           'token might be expired, make sure that you return a new token in the builder authorizationTokenBuilder()');
-      onAuthorizationTokenExpired?.call();
+      await onAuthorizationTokenExpired?.call();
       return true;
     }
 
