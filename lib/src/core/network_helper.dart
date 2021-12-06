@@ -80,6 +80,10 @@ class NetworkHelper {
         throw BadRequestException(body);
       case 401:
         throw UnauthorisedException(body);
+      case 403:
+        throw ForbiddenException(body);
+      case 404:
+        throw NotFoundException(body);
       case 500:
       default:
         throw FetchDataException(

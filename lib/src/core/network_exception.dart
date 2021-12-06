@@ -23,6 +23,14 @@ class UnauthorisedException extends NetworkException {
   UnauthorisedException([message]) : super(message, 'Unauthorised: ');
 }
 
+class ForbiddenException extends NetworkException {
+  ForbiddenException([message]) : super(message, 'Forbidden: ');
+}
+
+class NotFoundException extends NetworkException {
+  NotFoundException([message]) : super(message, 'Not Found: ');
+}
+
 class InvalidInputException extends NetworkException {
   InvalidInputException([String? message]) : super(message, 'Invalid Input: ');
 }
