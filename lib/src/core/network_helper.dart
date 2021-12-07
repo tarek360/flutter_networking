@@ -70,12 +70,13 @@ class NetworkHelper {
   String getStringResponse(Response response) {
     final String body = utf8.decode(response.bodyBytes);
 
+    if (response.statusCode == 204) {
+      return '[]';
+    } else if (response.statusCode >= 200 && response.statusCode <= 299) {
+      return body;
+    }
+
     switch (response.statusCode) {
-      case 201: // returned when events are being created
-      case 200:
-        return body;
-      case 204: // HTTP "no content"
-        return '[]';
       case 400:
         throw BadRequestException(body);
       case 401:
@@ -87,7 +88,7 @@ class NetworkHelper {
       case 500:
       default:
         throw FetchDataException(
-            'Error occurred while Communication with Server with StatusCode : ${response
+            'Error occurred while communicating with server with status code: ${response
                 .statusCode}');
     }
   }
