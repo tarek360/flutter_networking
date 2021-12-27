@@ -10,11 +10,12 @@ import 'network_request.dart';
 typedef BaseUrlBuilder = Future<String> Function();
 
 class NetworkHelper {
-  NetworkHelper(this._client, this._baseUrlBuilder);
+  NetworkHelper(this._client, this._baseUrlBuilder, this._https);
 
   final BaseUrlBuilder _baseUrlBuilder;
 
   final Client _client;
+  final bool _https;
 
   Future<String> execute(NetworkRequest networkRequest) async {
     try {
@@ -58,11 +59,21 @@ class NetworkHelper {
 
   Future<Uri> _getUri(String? endpointVersion, String endpoint,
       Map<String, String> params) async {
-    return Uri.https(
-      await _baseUrlBuilder(),
-      '$endpointVersion$endpoint',
-      params.isNotEmpty ? params : null,
-    );
+    final queryParameters = params.isNotEmpty ? params : null;
+
+    if (_https) {
+      return Uri.https(
+        await _baseUrlBuilder(),
+        '$endpointVersion$endpoint',
+        queryParameters,
+      );
+    } else {
+      return Uri.http(
+        await _baseUrlBuilder(),
+        '$endpointVersion$endpoint',
+        queryParameters,
+      );
+    }
   }
 
   void close() => _client.close();

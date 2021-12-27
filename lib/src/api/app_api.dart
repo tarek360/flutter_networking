@@ -20,7 +20,8 @@ class AppApi {
     BaseUrlBuilder _baseUrlBuilder, {
     required this.endpointVersion,
     this.authorizationTokenBuilder,
-  })  : _network = NetworkHelper(_client, _baseUrlBuilder),
+    bool https = true,
+  })  : _network = NetworkHelper(_client, _baseUrlBuilder, https),
         _jsonParser = JsonParser();
 
   final NetworkHelper _network;
