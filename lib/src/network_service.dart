@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:network/src/create_refresh_access_token_options.dart';
 import 'package:network/src/interceptor/access_token_interceptor.dart';
@@ -12,6 +13,7 @@ import 'logger.dart';
 import 'model/network_error_type.dart';
 
 typedef BaseUrlBuilder = Future<String> Function();
+typedef OnHttpClientCreate = HttpClient? Function(HttpClient client);
 
 class NetworkService {
   final JsonParser _jsonParser = JsonParser();
@@ -28,7 +30,12 @@ class NetworkService {
     _initInterceptors();
   }
 
-  _initInterceptors() {
+  void onHttpClientCreate(OnHttpClientCreate onHttpClientCreate) {
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        onHttpClientCreate;
+  }
+
+  void _initInterceptors() {
     _dio.interceptors.add(LoggingInterceptor(logger: logger));
 
     if (createRefreshAccessTokenOptions != null) {
