@@ -21,22 +21,25 @@ class NetworkService {
   final CreateRefreshAccessTokenOptions? createRefreshAccessTokenOptions;
   late Dio _dio;
   final BaseUrlBuilder baseUrlBuilder;
+  final bool enableLogging;
 
   NetworkService({
     required this.baseUrlBuilder,
     this.createRefreshAccessTokenOptions,
+    this.enableLogging = true,
   }) {
     _dio = Dio();
     _initInterceptors();
   }
 
   void onHttpClientCreate(OnHttpClientCreate onHttpClientCreate) {
-    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        onHttpClientCreate;
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = onHttpClientCreate;
   }
 
   void _initInterceptors() {
-    _dio.interceptors.add(LoggingInterceptor(logger: logger));
+    if (enableLogging) {
+      _dio.interceptors.add(LoggingInterceptor(logger: logger));
+    }
 
     if (createRefreshAccessTokenOptions != null) {
       _dio.interceptors.add(AccessTokenInterceptor(
