@@ -116,6 +116,7 @@ class LoggingInterceptor extends Interceptor {
       requestString += '${requestOptions?.method ?? ''} ${requestOptions?.path ?? ''}\n';
 
       if (_includeRequestHeaders) {
+        requestString += '===== Headers =====\n';
         for (final header in (requestOptions?.headers ?? {}).entries) {
           requestString += '${header.key}: ${header.value}\n';
         }

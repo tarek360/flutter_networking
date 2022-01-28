@@ -1,6 +1,7 @@
 library network;
 
 export 'src/create_refresh_access_token_options.dart';
+export 'src/interceptor/header_interceptor.dart';
 export 'src/model/network_error_type.dart';
 export 'src/model/network_request.dart';
 export 'src/model/network_response.dart';

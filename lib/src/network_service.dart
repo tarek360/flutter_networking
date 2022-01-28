@@ -9,6 +9,7 @@ import 'package:network/src/json_parser.dart';
 import 'package:network/src/model/network_request.dart';
 import 'package:network/src/model/network_response.dart';
 
+import 'interceptor/header_interceptor.dart';
 import 'logger.dart';
 import 'model/network_error_type.dart';
 
@@ -32,17 +33,28 @@ class NetworkService {
     _initInterceptors();
   }
 
+  void addInterceptor(Interceptor interceptor) {
+    _dio.interceptors.add(interceptor);
+  }
+
+  void addHeaderInterceptor(HeaderInterceptor interceptor) {
+    _dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+      interceptor.onHeaderRequest(options.headers);
+      handler.next(options);
+    }));
+  }
+
   void onHttpClientCreate(OnHttpClientCreate onHttpClientCreate) {
     (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = onHttpClientCreate;
   }
 
   void _initInterceptors() {
     if (enableLogging) {
-      _dio.interceptors.add(LoggingInterceptor(logger: logger));
+      addInterceptor(LoggingInterceptor(logger: logger));
     }
 
     if (createRefreshAccessTokenOptions != null) {
-      _dio.interceptors.add(AccessTokenInterceptor(
+      addInterceptor(AccessTokenInterceptor(
         dio: _dio,
         createAccessTokenOptions: createRefreshAccessTokenOptions!,
       ));
