@@ -45,7 +45,8 @@ class NetworkService {
   }
 
   void onHttpClientCreate(OnHttpClientCreate onHttpClientCreate) {
-    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = onHttpClientCreate;
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        onHttpClientCreate;
   }
 
   void _initInterceptors() {
@@ -61,7 +62,7 @@ class NetworkService {
     }
   }
 
-  Future<NetworkResponse<T>> request<T, K>({
+  Future<NetworkResponse<T>> request<T extends Object, K>({
     required NetworkRequest request,
     K Function(Map<String, dynamic>)? fromJson,
   }) async {
@@ -69,18 +70,48 @@ class NetworkService {
     try {
       final response = await _request(request);
 
-      final parsed = _jsonParser.parse(response.data, fromJson);
+      if (fromJson == null) {
+        return NetworkResponse.success(
+          jsonParser: _jsonParser,
+          statusCode: response.statusCode,
+          dataOnSuccess: null,
+          data: response.data,
+        );
+      }
 
-      return NetworkResponse.success(parsed);
+      final dataObject = _jsonParser.parse<T, K>(response.data, fromJson);
+
+      if (dataObject != null) {
+        return NetworkResponse.success(
+          jsonParser: _jsonParser,
+          statusCode: response.statusCode,
+          dataOnSuccess: dataObject,
+          data: response.data,
+        );
+      } else {
+        return NetworkResponse.failure(
+          jsonParser: _jsonParser,
+          statusCode: response.statusCode,
+          rawData: response.data,
+          errorType: NetworkErrorType.parsing,
+        );
+      }
     } on DioError catch (dioError) {
-      return NetworkResponse.failure(_getErrorType(dioError));
+      return NetworkResponse.failure(
+        jsonParser: _jsonParser,
+        statusCode: dioError.response?.statusCode,
+        rawData: dioError.response?.data,
+        errorType: _getErrorType(dioError),
+      );
     } on Error catch (e) {
       logger.e(e);
       logger.e(e.stackTrace);
-      return NetworkResponse.failure(NetworkErrorType.other);
-    } on JsonParsingException catch (e) {
-      logger.e(e);
-      return NetworkResponse.failure(NetworkErrorType.parsing);
+      return NetworkResponse.failure(
+        jsonParser: _jsonParser,
+        statusCode: null,
+        rawData: null,
+        errorType: NetworkErrorType.other,
+      );
     }
   }
 
@@ -131,6 +162,8 @@ class NetworkService {
       return NetworkErrorType.forbidden;
     } else if (statusCode == 404) {
       return NetworkErrorType.noData;
+    } else if (statusCode == 422) {
+      return NetworkErrorType.unprocessable;
     } else if (statusCode >= 500) {
       return NetworkErrorType.server;
     }

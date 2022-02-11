@@ -1,3 +1,5 @@
+import 'package:network/src/logger.dart';
+
 class JsonParser {
   T? parse<T, K>(dynamic data, K Function(Map<String, dynamic>)? fromJson) {
     T? t;
@@ -10,12 +12,14 @@ class JsonParser {
         }
       }
     } on Error catch (e) {
-      throw JsonParsingException(e);
+      logger.e('JSON parsing error:', e);
+      return null;
     }
     return t;
   }
 
-  List<K> _fromJsonList<K>(List<dynamic> jsonList, K Function(Map<String, dynamic>)? fromJson) {
+  List<K> _fromJsonList<K>(
+      List<dynamic> jsonList, K Function(Map<String, dynamic>)? fromJson) {
     final List<K> list = <K>[];
 
     if (fromJson != null) {
@@ -26,17 +30,5 @@ class JsonParser {
       return jsonList.cast<K>();
     }
     return list;
-  }
-}
-
-class JsonParsingException implements Exception {
-  const JsonParsingException(this.error);
-
-  final Error error;
-  static const _prefix = 'JSON parsing error: ';
-
-  @override
-  String toString() {
-    return '$_prefix $error\n${error.stackTrace.toString()}';
   }
 }
