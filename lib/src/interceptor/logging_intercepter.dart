@@ -78,7 +78,7 @@ class LoggingInterceptor extends Interceptor {
       final encoder = JsonEncoder.withIndent('  ');
       // Since the JSON could be a Map or List
       dynamic jsonBody;
-      if (data is String) {
+      if (data is String && data.isNotEmpty) {
         jsonBody = jsonDecode(data);
       } else {
         jsonBody = data;
