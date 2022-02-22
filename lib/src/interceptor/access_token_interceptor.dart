@@ -103,4 +103,8 @@ class AccessTokenInterceptor extends Interceptor {
     _accessToken ??= await createAccessTokenOptions.currentToken;
     options.headers['Authorization'] = 'Bearer $_accessToken';
   }
+
+  void clear() {
+    _accessToken = null;
+  }
 }

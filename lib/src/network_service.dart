@@ -45,8 +45,7 @@ class NetworkService {
   }
 
   void onHttpClientCreate(OnHttpClientCreate onHttpClientCreate) {
-    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        onHttpClientCreate;
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = onHttpClientCreate;
   }
 
   void _initInterceptors() {
@@ -59,6 +58,14 @@ class NetworkService {
         dio: _dio,
         createAccessTokenOptions: createRefreshAccessTokenOptions!,
       ));
+    }
+  }
+
+  /// Clear token from memory for users that use [CreateRefreshAccessTokenOptions]
+  void clear() {
+    final interceptor = _dio.interceptors.firstWhere((element) => element is AccessTokenInterceptor);
+    if (interceptor is AccessTokenInterceptor) {
+      interceptor.clear();
     }
   }
 
