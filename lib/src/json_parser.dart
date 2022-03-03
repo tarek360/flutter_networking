@@ -12,7 +12,7 @@ class JsonParser {
         }
       }
     } on Error catch (e) {
-      logger.e('JSON parsing error:', e);
+      logger.e('JSON parsing error', e, e.stackTrace);
       return null;
     }
     return t;
