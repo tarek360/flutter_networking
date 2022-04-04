@@ -77,15 +77,6 @@ class NetworkService {
     try {
       final response = await _request(request);
 
-      if (fromJson == null) {
-        return NetworkResponse.success(
-          jsonParser: _jsonParser,
-          statusCode: response.statusCode,
-          dataOnSuccess: null,
-          data: response.data,
-        );
-      }
-
       final dataObject = _jsonParser.parse<T, K>(response.data, fromJson);
 
       if (dataObject != null) {
