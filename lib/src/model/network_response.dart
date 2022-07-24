@@ -5,8 +5,8 @@ class NetworkResponse<T> {
   final bool _isSuccess;
   final JsonParser _jsonParser;
   final T? _dataOnSuccess;
+  final dynamic rawData;
   final NetworkErrorType? _errorType;
-  final dynamic _rawData;
   final int? statusCode;
 
   NetworkResponse(
@@ -14,7 +14,7 @@ class NetworkResponse<T> {
     this._jsonParser,
     this.statusCode, [
     this._dataOnSuccess,
-    this._rawData,
+    this.rawData,
     this._errorType,
   ]);
 
@@ -22,9 +22,9 @@ class NetworkResponse<T> {
     required JsonParser jsonParser,
     required int? statusCode,
     required T? dataOnSuccess,
-    required dynamic data,
+    required dynamic rawData,
   }) {
-    return NetworkResponse<T>(true, jsonParser, statusCode, dataOnSuccess);
+    return NetworkResponse<T>(true, jsonParser, statusCode, dataOnSuccess, rawData);
   }
 
   factory NetworkResponse.failure({
@@ -33,13 +33,12 @@ class NetworkResponse<T> {
     required dynamic rawData,
     required NetworkErrorType errorType,
   }) {
-    return NetworkResponse(
-        false, jsonParser, statusCode, null, rawData, errorType);
+    return NetworkResponse(false, jsonParser, statusCode, null, rawData, errorType);
   }
 
   K? getDataOnError<K>({required K Function(Map<String, dynamic>) fromJson}) {
     if (!_isSuccess) {
-      return _jsonParser.parse(_rawData, fromJson);
+      return _jsonParser.parse(rawData, fromJson);
     }
   }
 

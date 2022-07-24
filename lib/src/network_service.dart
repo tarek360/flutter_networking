@@ -83,8 +83,8 @@ class NetworkService {
         return NetworkResponse.success(
           jsonParser: _jsonParser,
           statusCode: response.statusCode,
+          rawData: response.data,
           dataOnSuccess: null,
-          data: response.data,
         );
       }
 
@@ -92,8 +92,8 @@ class NetworkService {
         return NetworkResponse.success(
           jsonParser: _jsonParser,
           statusCode: response.statusCode,
+          rawData: response.data,
           dataOnSuccess: dataObject,
-          data: response.data,
         );
       } else {
         return NetworkResponse.failure(
