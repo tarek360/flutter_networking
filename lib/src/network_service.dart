@@ -28,8 +28,14 @@ class NetworkService {
     required this.baseUrlBuilder,
     this.createRefreshAccessTokenOptions,
     this.enableLogging = true,
+    int connectTimeout = 8000,
+    int sendTimeout = 8000,
+    int receiveTimeout = 10000,
   }) {
     _dio = Dio();
+    _dio.options.connectTimeout = connectTimeout;
+    _dio.options.sendTimeout = sendTimeout;
+    _dio.options.receiveTimeout = receiveTimeout;
     _initInterceptors();
   }
 
