@@ -45,7 +45,7 @@ class NetworkService {
 
   void addHeaderInterceptor(HeaderInterceptor interceptor) {
     _dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
-      interceptor.onHeaderRequest(options.headers);
+      interceptor.onHeaderRequest(options);
       handler.next(options);
     }));
   }

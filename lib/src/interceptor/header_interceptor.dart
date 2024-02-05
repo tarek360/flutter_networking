@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 abstract class HeaderInterceptor {
-  void onHeaderRequest(Map<String, dynamic> headers);
+  void onHeaderRequest(RequestOptions options);
 }
