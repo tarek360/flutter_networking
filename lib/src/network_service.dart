@@ -67,14 +67,6 @@ class NetworkService {
     }
   }
 
-  /// Clear token from memory for users that use [CreateRefreshAccessTokenOptions]
-  void clear() {
-    final interceptor = _dio.interceptors.firstWhere((element) => element is AccessTokenInterceptor);
-    if (interceptor is AccessTokenInterceptor) {
-      interceptor.clear();
-    }
-  }
-
   Future<NetworkResponse<T>> request<T extends Object, K>({
     required NetworkRequest request,
     K Function(Map<String, dynamic>)? fromJson,

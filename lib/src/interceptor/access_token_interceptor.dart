@@ -14,8 +14,6 @@ class AccessTokenInterceptor extends Interceptor {
   final Dio dio;
   final CreateRefreshAccessTokenOptions createAccessTokenOptions;
 
-  String? _accessToken;
-
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     if (!_isCreateTokenRequest(options)) {
@@ -29,7 +27,6 @@ class AccessTokenInterceptor extends Interceptor {
     if (err.response?.statusCode == 401 && !_isCreateTokenRequest(err.requestOptions)) {
       final token = await _refreshAccessToken();
       if (token != null) {
-        _accessToken = token;
         return await _retry(err, handler);
       }
     }
@@ -87,12 +84,19 @@ class AccessTokenInterceptor extends Interceptor {
     final request = await createAccessTokenOptions.networkRequest;
 
     if (request != null) {
-      final response = await _executeRequest(NetworkRequestMapper.transform(request));
-      final token = createAccessTokenOptions.parse(response.data);
-      _accessToken = token;
-      createAccessTokenOptions.onTokenCreated(token);
-      return token;
+      final result = await _executeRequest(NetworkRequestMapper.transform(request));
+      if (result is Response) {
+        final data = result.data;
+        if (data != null) {
+          final token = createAccessTokenOptions.parse(data);
+          createAccessTokenOptions.onTokenCreated(token);
+          return token;
+        }
+      }
     }
+
+    logger.e('Token refreshment failed.');
+    return null;
   }
 
   bool _isCreateTokenRequest(RequestOptions options) {
@@ -100,11 +104,7 @@ class AccessTokenInterceptor extends Interceptor {
   }
 
   Future<void> _addToken(RequestOptions options) async {
-    _accessToken ??= await createAccessTokenOptions.currentToken;
-    options.headers['Authorization'] = 'Bearer $_accessToken';
-  }
-
-  void clear() {
-    _accessToken = null;
+    final accessToken = await createAccessTokenOptions.currentToken;
+    options.headers['Authorization'] = 'Bearer $accessToken';
   }
 }
