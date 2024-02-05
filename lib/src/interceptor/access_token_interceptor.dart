@@ -5,7 +5,7 @@ import 'package:network/src/model/network_request_mapper.dart';
 
 typedef OnAccessTokenExpired = Future<String> Function();
 
-class AccessTokenInterceptor extends Interceptor {
+class AccessTokenInterceptor extends QueuedInterceptor {
   AccessTokenInterceptor({
     required this.dio,
     required this.createAccessTokenOptions,
