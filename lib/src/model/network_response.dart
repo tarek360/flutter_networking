@@ -40,6 +40,7 @@ class NetworkResponse<T> {
     if (!_isSuccess) {
       return _jsonParser.parse(rawData, fromJson);
     }
+    return null;
   }
 
   R when<R>({
@@ -48,7 +49,7 @@ class NetworkResponse<T> {
   }) {
     if (_isSuccess) {
       if (_dataOnSuccess != null) {
-        return success(_dataOnSuccess!);
+        return success(_dataOnSuccess as T);
       } else {
         return success(true as T);
       }
