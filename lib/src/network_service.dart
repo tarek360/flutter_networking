@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:network/src/create_refresh_access_token_options.dart';
 import 'package:network/src/interceptor/access_token_interceptor.dart';
 import 'package:network/src/interceptor/logging_intercepter.dart';
@@ -14,7 +14,7 @@ import 'logger.dart';
 import 'model/network_error_type.dart';
 
 typedef BaseUrlBuilder = Future<String> Function();
-typedef OnHttpClientCreate = HttpClient Function();
+typedef OnHttpClientCreate = HttpClient? Function(HttpClient client);
 
 class NetworkService {
   final JsonParser _jsonParser = JsonParser();
@@ -51,7 +51,7 @@ class NetworkService {
   }
 
   void onHttpClientCreate(OnHttpClientCreate onHttpClientCreate) {
-    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = onHttpClientCreate;
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = onHttpClientCreate;
   }
 
   void _initInterceptors() {
@@ -101,12 +101,12 @@ class NetworkService {
           errorType: NetworkErrorType.parsing,
         );
       }
-    } on DioException catch (dioException) {
+    } on DioError catch (dioError) {
       return NetworkResponse.failure(
         jsonParser: _jsonParser,
-        statusCode: dioException.response?.statusCode,
-        rawData: dioException.response?.data,
-        errorType: _getErrorType(dioException),
+        statusCode: dioError.response?.statusCode,
+        rawData: dioError.response?.data,
+        errorType: _getErrorType(dioError),
       );
     } on Error catch (e) {
       logger.e(e);
@@ -134,23 +134,21 @@ class NetworkService {
     );
   }
 
-  NetworkErrorType _getErrorType(DioException dioException) {
-    switch (dioException.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-      case DioExceptionType.connectionError:
+  NetworkErrorType _getErrorType(DioError dioError) {
+    switch (dioError.type) {
+      case DioErrorType.connectTimeout:
+      case DioErrorType.sendTimeout:
+      case DioErrorType.receiveTimeout:
         return NetworkErrorType.badConnection;
 
-      case DioExceptionType.badResponse:
-      case DioExceptionType.badCertificate:
-        return _getErrorTypeWhenHaveResponse(dioException.response?.statusCode);
+      case DioErrorType.response:
+        return _getErrorTypeWhenHaveResponse(dioError.response?.statusCode);
 
-      case DioExceptionType.cancel:
+      case DioErrorType.cancel:
         return NetworkErrorType.cancel;
 
-      case DioExceptionType.unknown:
-        if (dioException.error is SocketException) {
+      case DioErrorType.other:
+        if (dioError.error is SocketException) {
           return NetworkErrorType.badConnection;
         } else {
           return NetworkErrorType.other;
