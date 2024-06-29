@@ -70,8 +70,9 @@ class NetworkService {
   Future<NetworkResponse<T>> request<T extends Object, K>({
     required NetworkRequest request,
     K Function(Map<String, dynamic>)? fromJson,
+    String? customBaseUrl,
   }) async {
-    _dio.options.baseUrl = await baseUrlBuilder();
+    _dio.options.baseUrl = customBaseUrl ?? await baseUrlBuilder();
     try {
       final response = await _request(request);
 
