@@ -28,8 +28,14 @@ class NetworkService {
     required this.baseUrlBuilder,
     this.createRefreshAccessTokenOptions,
     this.enableLogging = true,
+    int connectTimeout = 8000,
+    int sendTimeout = 8000,
+    int receiveTimeout = 10000,
   }) {
     _dio = Dio();
+    _dio.options.connectTimeout = connectTimeout;
+    _dio.options.sendTimeout = sendTimeout;
+    _dio.options.receiveTimeout = receiveTimeout;
     _initInterceptors();
   }
 
@@ -39,7 +45,7 @@ class NetworkService {
 
   void addHeaderInterceptor(HeaderInterceptor interceptor) {
     _dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
-      interceptor.onHeaderRequest(options.headers);
+      interceptor.onHeaderRequest(options);
       handler.next(options);
     }));
   }
@@ -58,14 +64,6 @@ class NetworkService {
         dio: _dio,
         createAccessTokenOptions: createRefreshAccessTokenOptions!,
       ));
-    }
-  }
-
-  /// Clear token from memory for users that use [CreateRefreshAccessTokenOptions]
-  void clear() {
-    final interceptor = _dio.interceptors.firstWhere((element) => element is AccessTokenInterceptor);
-    if (interceptor is AccessTokenInterceptor) {
-      interceptor.clear();
     }
   }
 

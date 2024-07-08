@@ -76,17 +76,22 @@ class LoggingInterceptor extends Interceptor {
   String _getBody(dynamic data, String? contentType) {
     if (contentType != null && contentType.toLowerCase().contains('application/json')) {
       final encoder = JsonEncoder.withIndent('  ');
-      // Since the JSON could be a Map or List
-      dynamic jsonBody;
-      if (data is String && data.isNotEmpty) {
-        jsonBody = jsonDecode(data);
-      } else {
-        jsonBody = data;
-      }
+      final dynamic jsonBody = _jsonDecodeOrNull(data) ?? data;
       return encoder.convert(jsonDecode(jsonEncode(jsonBody)));
     } else {
       return data.toString();
     }
+  }
+
+  dynamic _jsonDecodeOrNull(dynamic data) {
+    if (data is String) {
+      try {
+        return json.decode(data);
+      } on FormatException {
+        return null;
+      }
+    }
+    return null;
   }
 
   String _getQueryParams(Map<String, dynamic>? queryParams) {
