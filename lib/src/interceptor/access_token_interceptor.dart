@@ -23,7 +23,7 @@ class AccessTokenInterceptor extends QueuedInterceptor {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401 && !_isCreateTokenRequest(err.requestOptions)) {
       final token = await _refreshAccessToken();
       if (token != null) {
@@ -33,14 +33,14 @@ class AccessTokenInterceptor extends QueuedInterceptor {
     return super.onError(err, handler);
   }
 
-  Future<void> _retry(DioError err, ErrorInterceptorHandler handler) async {
+  Future<void> _retry(DioException err, ErrorInterceptorHandler handler) async {
     await _addToken(err.requestOptions);
 
     final result = await _executeRequest(err.requestOptions);
 
     if (result is Response) {
       return handler.resolve(result);
-    } else if (result is DioError) {
+    } else if (result is DioException) {
       if (result.response?.statusCode == 401) {
         return handler.reject(result);
       } else {
@@ -69,7 +69,7 @@ class AccessTokenInterceptor extends QueuedInterceptor {
       );
 
       result = response;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       result = e;
     } finally {
       dio.interceptors.add(this);
@@ -94,8 +94,9 @@ class AccessTokenInterceptor extends QueuedInterceptor {
         }
       }
     }
-
+    
     logger.e('Token refreshment failed.');
+
     return null;
   }
 

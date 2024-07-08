@@ -57,7 +57,7 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     final stringBuffer = StringBuffer();
     if (_httpLoggerFilter == null || _httpLoggerFilter!()) {
       final message = _prepareLog(err.requestOptions, err.response);
@@ -130,11 +130,11 @@ class LoggingInterceptor extends Interceptor {
       if (_includeRequestQueryParams &&
           requestOptions?.queryParameters != null &&
           requestOptions!.queryParameters.isNotEmpty) {
-        requestString += '\n' + _getQueryParams(requestOptions.queryParameters);
+        requestString += '\n${_getQueryParams(requestOptions.queryParameters)}';
       }
 
       if (_includeRequestBody && requestOptions?.data != null) {
-        requestString += '\n\n' + _getBody(requestOptions?.data, requestOptions?.contentType);
+        requestString += '\n\n${_getBody(requestOptions?.data, requestOptions?.contentType)}';
       }
 
       requestString += '\n\n';
@@ -152,7 +152,7 @@ class LoggingInterceptor extends Interceptor {
       }
 
       if (_includeResponseBody && response.data != null) {
-        responseString += '\n\n' + _getBody(response.data, response.headers.value('content-type'));
+        responseString += '\n\n${_getBody(response.data, response.headers.value('content-type'))}';
       }
     }
 
