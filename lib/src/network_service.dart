@@ -33,9 +33,9 @@ class NetworkService {
     int receiveTimeout = 10000,
   }) {
     _dio = Dio();
-    _dio.options.connectTimeout = connectTimeout;
-    _dio.options.sendTimeout = sendTimeout;
-    _dio.options.receiveTimeout = receiveTimeout;
+    _dio.options.connectTimeout = Duration(milliseconds: connectTimeout);
+    _dio.options.sendTimeout = Duration(milliseconds: sendTimeout);
+    _dio.options.receiveTimeout = Duration(milliseconds: receiveTimeout);
     _initInterceptors();
   }
 
