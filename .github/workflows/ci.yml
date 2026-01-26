@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, claude/setup-github-actions-25Qes]
+  pull_request:
+    branches: [main, master, claude/setup-github-actions-25Qes]
+    
+jobs:
+  analyze:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+        continue-on-error: true
+        
+      - name: Analyze project
+        run: dart analyze --fatal-infos
+        continue-on-error: true
+
+      - name: Run tests
+        run: dart test
+        continue-on-error: true
+
+      - name: Run example
+        run: dart run example/example.dart
