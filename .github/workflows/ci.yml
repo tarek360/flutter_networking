@@ -2,10 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, claude/setup-github-actions-25Qes]
   pull_request:
-    branches: [main, master]
-
+    branches: [main, master, claude/setup-github-actions-25Qes]
+    
 jobs:
   analyze:
     name: Analyze & Test
