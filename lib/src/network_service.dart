@@ -70,10 +70,11 @@ class NetworkService {
   Future<NetworkResponse<T>> request<T extends Object, K>({
     required NetworkRequest request,
     K Function(Map<String, dynamic>)? fromJson,
+    CancelToken? cancelToken,
   }) async {
     _dio.options.baseUrl = await baseUrlBuilder();
     try {
-      final response = await _request(request);
+      final response = await _request(request, cancelToken: cancelToken);
 
       final dataObject = _jsonParser.parse<T, K>(response.data, fromJson);
 
@@ -120,7 +121,7 @@ class NetworkService {
     }
   }
 
-  Future<Response> _request(NetworkRequest request) {
+  Future<Response> _request(NetworkRequest request, {CancelToken? cancelToken}) {
     final options = Options(
       method: request.method,
       headers: request.headers,
@@ -131,6 +132,7 @@ class NetworkService {
       data: request.body,
       queryParameters: request.queryParameters,
       options: options,
+      cancelToken: cancelToken,
     );
   }
 
