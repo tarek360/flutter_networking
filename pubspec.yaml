@@ -1,5 +1,8 @@
 name: network
-description: A starting point for Dart libraries or applications.
+description: >-
+  A lightweight Dio wrapper that turns HTTP calls into typed, exhaustively
+  handled results, with pluggable access-token refresh, header injection,
+  and structured request/response logging.
 version: 1.0.0
 publish_to: none
 environment:
